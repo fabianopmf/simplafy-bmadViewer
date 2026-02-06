@@ -1,0 +1,63 @@
+# Deploy do BMAD Viewer para simplafy.com.br/bmadviewer (VPS Hostinger).
+# Tudo roda neste repositório; o simplafy-saude NÃO é alterado.
+# Trigger: manual, agendado (a cada 6h) ou push na main (quando o viewer muda).
+# Secrets neste repo: GH_PAT (leitura do simplafy-saude), HOSTINGER_SSH_KEY, HOSTINGER_HOST, HOSTINGER_USER.
+
+name: Deploy BMAD Viewer to VPS
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+  push:
+    branches: [main]
+
+jobs:
+  deploy-viewer:
+    name: Build and deploy viewer to VPS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout simplafy-bmadViewer
+        uses: actions/checkout@v4
+        with:
+          path: viewer-repo
+
+      - name: Checkout simplafy-saude (só leitura, para artefatos)
+        uses: actions/checkout@v4
+        with:
+          repository: fabianopmf/simplafy-saude
+          path: saude-repo
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Prepare viewer bundle
+        run: |
+          ARTIFACTS_DIR="${{ github.workspace }}/saude-repo/_bmad-output"
+          VIEWER_DIR="${{ github.workspace }}/viewer-repo"
+          OUT_DIR="${{ github.workspace }}/deploy-viewer"
+          if [[ ! -d "$ARTIFACTS_DIR" ]]; then
+            echo "::warning::_bmad-output não encontrado no simplafy-saude; pulando deploy."
+            echo "skip_deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          "$VIEWER_DIR/scripts/prepare-viewer-deploy.sh" "$OUT_DIR" "$VIEWER_DIR" "$ARTIFACTS_DIR"
+          echo "skip_deploy=false" >> "$GITHUB_OUTPUT"
+        id: prepare
+
+      - name: Deploy to VPS (rsync over SSH)
+        if: steps.prepare.outputs.skip_deploy != 'true'
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_USER }}
+        run: |
+          if [[ -z "$SSH_KEY" || -z "$SSH_HOST" || -z "$SSH_USER" ]]; then
+            echo "::warning::Secrets da Hostinger não configurados. Configure HOSTINGER_SSH_KEY, HOSTINGER_HOST, HOSTINGER_USER neste repo."
+            exit 0
+          fi
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            "${{ github.workspace }}/deploy-viewer/" \
+            "$SSH_USER@$SSH_HOST:public_html/bmadviewer/"
+          echo "Deploy do BMAD Viewer concluído em public_html/bmadviewer/"

@@ -25,10 +25,11 @@ O viewer carrega estes arquivos por fetch; **todos** devem existir na pasta de d
 
 ## Deploy
 
-O deploy **não** é disparado por push neste repo diretamente para a VPS. O fluxo definido no plano é:
+O deploy roda **só neste repositório** (simplafy-bmadViewer). O **simplafy-saude não é alterado** em nada; este repo só faz checkout de leitura do simplafy-saude para pegar os artefatos (`_bmad-output`).
 
-- Quando há push na **main** do **simplafy-saude**, o workflow `.github/workflows/deploy-bmadviewer.yml` (novo arquivo, não altera o pipeline existente) faz checkout deste repo, roda o script de empacotamento e publica na VPS em `public_html/bmadviewer/`.
-- **Secrets necessários no simplafy-saude:** `HOSTINGER_SSH_KEY`, `HOSTINGER_HOST`, `HOSTINGER_USER` (deploy na VPS); `GH_PAT` (token com acesso de leitura a este repo, para o checkout do simplafy-bmadViewer).
+- Workflow: `.github/workflows/deploy-viewer.yml` (neste repo).
+- **Triggers:** manual (`workflow_dispatch`), agendado (a cada 6 h) ou push na `main` (quando o código do viewer muda).
+- **Secrets neste repo (simplafy-bmadViewer):** `GH_PAT` (token com acesso de **leitura** ao repo simplafy-saude), `HOSTINGER_SSH_KEY`, `HOSTINGER_HOST`, `HOSTINGER_USER`.
 
 ### Script de empacotamento
 
