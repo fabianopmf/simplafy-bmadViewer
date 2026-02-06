@@ -29,7 +29,20 @@ O deploy roda **só neste repositório** (simplafy-bmadViewer). O **simplafy-sau
 
 - Workflow: `.github/workflows/deploy-viewer.yml` (neste repo).
 - **Triggers:** manual (`workflow_dispatch`), agendado (a cada 6 h) ou push na `main` (quando o código do viewer muda).
-- **Repositório:** `Simplafy-tec/simplafy-bmadViewer` (git@github.com:Simplafy-tec/simplafy-bmadViewer.git). A org já tem fluxo de push para a VPS; os secrets da Hostinger podem estar na org (`HOSTINGER_SSH_KEY`, `HOSTINGER_HOST`, `HOSTINGER_USER`). Para o checkout do simplafy-saude (outro repo), se for privado: token com leitura (ex.: `GH_PAT`).
+- **Repositório:** `Simplafy-tec/simplafy-bmadViewer` (git@github.com:Simplafy-tec/simplafy-bmadViewer.git). Nada está configurado ainda neste repo; o fluxo ativo de deploy para a VPS é o do **site**. Para este viewer passar a fazer deploy na mesma VPS, é preciso configurar os secrets abaixo.
+
+### O que configurar para o deploy funcionar
+
+No GitHub: **Simplafy-tec/simplafy-bmadViewer** → Settings → Secrets and variables → Actions. Adicionar:
+
+| Secret | Uso |
+|--------|-----|
+| `HOSTINGER_SSH_KEY` | Chave privada SSH para a VPS (a mesma que o deploy do site usa, se tiver) |
+| `HOSTINGER_HOST` | Host da VPS (ex.: `exemplo.hosting.com` ou IP) |
+| `HOSTINGER_USER` | Usuário SSH na VPS |
+| `GH_PAT` | Token (PAT) com permissão de **leitura** no repo `Simplafy-tec/simplafy-saude`, para o workflow clonar os artefatos |
+
+Se o deploy do site já usar esses nomes no outro repo, pode copiar os mesmos valores (ou criar um secret na **organização** e reutilizar nos dois repos).
 
 ### Script de empacotamento
 
