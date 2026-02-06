@@ -29,7 +29,7 @@ O deploy roda **só neste repositório** (simplafy-bmadViewer). O **simplafy-sau
 
 - Workflow: `.github/workflows/deploy-viewer.yml` (neste repo).
 - **Triggers:** manual (`workflow_dispatch`), agendado (a cada 6 h) ou push na `main` (quando o código do viewer muda).
-- **Secrets neste repo (simplafy-bmadViewer):** `GH_PAT` (token com acesso de **leitura** ao repo simplafy-saude), `HOSTINGER_SSH_KEY`, `HOSTINGER_HOST`, `HOSTINGER_USER`.
+- **Repositório:** `Simplafy-tec/simplafy-bmadViewer` (git@github.com:Simplafy-tec/simplafy-bmadViewer.git). A org já tem fluxo de push para a VPS; os secrets da Hostinger podem estar na org (`HOSTINGER_SSH_KEY`, `HOSTINGER_HOST`, `HOSTINGER_USER`). Para o checkout do simplafy-saude (outro repo), se for privado: token com leitura (ex.: `GH_PAT`).
 
 ### Script de empacotamento
 

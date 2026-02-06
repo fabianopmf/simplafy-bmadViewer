@@ -1,7 +1,8 @@
 # Deploy do BMAD Viewer para simplafy.com.br/bmadviewer (VPS Hostinger).
-# Tudo roda neste repositório; o simplafy-saude NÃO é alterado.
-# Trigger: manual, agendado (a cada 6h) ou push na main (quando o viewer muda).
-# Secrets neste repo: GH_PAT (leitura do simplafy-saude), HOSTINGER_SSH_KEY, HOSTINGER_HOST, HOSTINGER_USER.
+# Repo: Simplafy-tec/simplafy-bmadViewer (git@github.com:Simplafy-tec/simplafy-bmadViewer.git).
+# Tudo roda neste repositório; o simplafy-saude NÃO é alterado (apenas checkout de leitura).
+# A org já tem push para VPS; se HOSTINGER_* estiverem configurados (repo ou org), o deploy usa os mesmos.
+# Para clonar simplafy-saude (outro repo): token com leitura (ex.: GH_PAT) se o repo for privado.
 
 name: Deploy BMAD Viewer to VPS
 
@@ -25,7 +26,7 @@ jobs:
       - name: Checkout simplafy-saude (só leitura, para artefatos)
         uses: actions/checkout@v4
         with:
-          repository: fabianopmf/simplafy-saude
+          repository: Simplafy-tec/simplafy-saude
           path: saude-repo
           token: ${{ secrets.GH_PAT }}
 
