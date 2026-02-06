@@ -1,0 +1,9 @@
+{
+  "name": "bmad-viewer",
+  "private": true,
+  "type": "module",
+  "description": "Viewer de documentação BMAD (planning-artifacts)",
+  "scripts": {
+    "test": "node test/run-parsers.mjs"
+  }
+}
